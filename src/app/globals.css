@@ -1,0 +1,303 @@
+@import "tailwindcss";
+
+/* ---- Design tokens (PRD 5.2) ---- */
+@theme {
+  --color-desk: #202020;
+  --color-desk-raised: #292725;
+  --color-paper: #f3e5cc;
+  --color-paper-hi: #fff1d9;
+  --color-accent: #d94b39;
+  --color-accent-hi: #ff6a5e;
+  /* Filled buttons / badges with cream text: 4.69:1 on #FFF1D9 (AA). */
+  --color-accent-strong: #c0402e;
+  /* Darker accent used for small text on paper (AA on #F3E5CC). */
+  --color-accent-ink: #a8321f;
+  --color-ink: #27231f;
+  --color-ink-soft: #4d453d;
+  --color-chalk: #f2e6d4;
+  --color-chalk-muted: #a8a097;
+  --color-deco-blue: #315da7;
+  --color-deco-green: #77943c;
+
+  --font-hand: var(--font-hand-face), "Segoe Print", "Comic Sans MS", cursive;
+  --font-serif: var(--font-serif-face), Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-sans-face), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+  --breakpoint-xs: 30rem;
+}
+
+:root {
+  color-scheme: dark;
+  --header-h: 4rem;
+}
+
+html {
+  scroll-padding-top: calc(var(--header-h) + 1rem);
+  -webkit-text-size-adjust: 100%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+
+body {
+  background-color: var(--color-desk);
+  color: var(--color-chalk);
+  font-family: var(--font-sans);
+  overflow-x: clip;
+  /* subtle desk grain via layered gradients, no image request */
+  background-image:
+    radial-gradient(circle at 20% 10%, rgb(255 255 255 / 0.025), transparent 40%),
+    radial-gradient(circle at 80% 70%, rgb(255 255 255 / 0.02), transparent 45%);
+  background-attachment: fixed;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-accent-hi);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ---- Paper & scrapbook treatments (PRD 5.4) ---- */
+@utility paper {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  background-image:
+    linear-gradient(rgb(39 35 31 / 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(39 35 31 / 0.06) 1px, transparent 1px);
+  background-size: 22px 22px;
+  background-position: -1px -1px;
+}
+
+@utility paper-plain {
+  background-color: var(--color-paper-hi);
+  color: var(--color-ink);
+}
+
+@utility tape {
+  position: relative;
+  &::before {
+    content: "";
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    width: 92px;
+    height: 26px;
+    translate: -50% 0;
+    rotate: var(--tape-angle, -3deg);
+    background: var(--tape-color, rgb(255 241 217 / 0.72));
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.18);
+    border-left: 2px dotted rgb(39 35 31 / 0.12);
+    border-right: 2px dotted rgb(39 35 31 / 0.12);
+    pointer-events: none;
+  }
+}
+
+@utility pin {
+  position: relative;
+  &::before {
+    content: "";
+    position: absolute;
+    top: -7px;
+    left: 50%;
+    width: 14px;
+    height: 14px;
+    translate: -50% 0;
+    border-radius: 9999px;
+    background: radial-gradient(circle at 35% 35%, var(--color-accent-hi), var(--color-accent) 60%, #8f2a1c);
+    box-shadow: 0 2px 3px rgb(0 0 0 / 0.3);
+  }
+}
+
+/* ---- Reveal (progressive: content visible without JS) ---- */
+.js [data-reveal]:not([data-revealed]) {
+  opacity: 0;
+  translate: 0 14px;
+}
+[data-reveal] {
+  transition: opacity 0.5s ease, translate 0.5s ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .js [data-reveal]:not([data-revealed]) { opacity: 1; translate: 0 0; }
+  [data-reveal], * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
+
+/* ---- Mobile static path (below md) ---- */
+.static-path {
+  background-image: radial-gradient(circle, var(--color-accent) 1.5px, transparent 1.8px);
+  background-size: 4px 10px;
+  background-repeat: repeat-y;
+}
+
+@keyframes float {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -6px; }
+}
+.float-slow { animation: float 7s ease-in-out infinite; }
+
+/* ===== Creative pass: scrapbook details ===== */
+
+/* spiral-binding holes down the left of a notebook page */
+.binding {
+  background-image: radial-gradient(circle at 50% 50%, var(--color-desk) 5.5px, rgb(39 35 31 / 0.25) 6.5px, transparent 7.5px);
+  background-size: 100% 38px;
+  background-repeat: repeat-y;
+  background-position: 0 14px;
+}
+
+/* highlighter swipe behind a word */
+.marker {
+  background-image: linear-gradient(100deg, transparent 2%, rgb(255 106 94 / 0.38) 4%, rgb(255 106 94 / 0.3) 94%, transparent 97%);
+  background-size: 100% 42%;
+  background-position: 0 88%;
+  background-repeat: no-repeat;
+  padding-inline: 0.08em;
+}
+
+/* hand-drawn strokes that draw themselves once */
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.draw-on {
+  stroke-dasharray: var(--len, 400);
+  stroke-dashoffset: var(--len, 400);
+  animation: draw 1.1s 0.5s cubic-bezier(0.6, 0, 0.3, 1) forwards;
+}
+.js [data-revealed] .draw-on-reveal {
+  animation: draw 1s 0.2s cubic-bezier(0.6, 0, 0.3, 1) forwards;
+}
+.draw-on-reveal { stroke-dasharray: var(--len, 300); stroke-dashoffset: var(--len, 300); }
+html:not(.js) .draw-on-reveal { stroke-dashoffset: 0; }
+
+/* ruled index card */
+@utility index-card {
+  background-color: var(--color-paper-hi);
+  color: var(--color-ink);
+  background-image:
+    linear-gradient(to bottom, transparent 3.25rem, rgb(217 75 57 / 0.45) 3.25rem, rgb(217 75 57 / 0.45) calc(3.25rem + 1.5px), transparent calc(3.25rem + 1.5px)),
+    repeating-linear-gradient(to bottom, transparent 0 27px, rgb(49 93 167 / 0.16) 27px 28px);
+  background-position: 0 0, 0 calc(3.25rem + 10px);
+}
+
+/* rubber stamp */
+.stamp {
+  border: 2.5px solid currentColor;
+  box-shadow: inset 0 0 0 2px var(--color-paper), inset 0 0 0 3.5px currentColor;
+  -webkit-mask-image: radial-gradient(circle at 30% 40%, #000 60%, rgb(0 0 0 / 0.75) 61%, #000 75%);
+          mask-image: radial-gradient(circle at 30% 40%, #000 60%, rgb(0 0 0 / 0.75) 61%, #000 75%);
+}
+
+/* ruled lines for postcard address */
+.ruled-line { border-bottom: 1.5px solid rgb(39 35 31 / 0.35); }
+
+/* tilt that straightens on hover/focus */
+.tilt { rotate: var(--tilt, 0deg); transition: rotate 0.3s ease, translate 0.3s ease, box-shadow 0.3s ease; }
+.tilt:hover, .tilt:focus-within { rotate: 0deg; translate: 0 -4px; }
+
+
+/* ===== Custom pencil cursor (pointer devices only) ===== */
+@media (hover: hover) and (pointer: fine) {
+  html, body {
+    cursor: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"%3E%3Cg transform="rotate(45 16 16)"%3E%3Cpath d="M12.5 1.5 h7 v21.5 L16 30.5 L12.5 23z" fill="none" stroke="%23FFF1D9" stroke-width="3.6" stroke-linejoin="round"/%3E%3Cpath d="M12.5 1.5 h7 v4 h-7z" fill="%23F2A9A0"/%3E%3Cpath d="M12.5 5.5 h7 v2.5 h-7z" fill="%23FFF1D9"/%3E%3Cpath d="M12.5 8 h7 v15 h-7z" fill="%23D94B39"/%3E%3Cpath d="M12.5 23 L16 30.5 L19.5 23z" fill="%23F3E5CC"/%3E%3Cpath d="M12.5 5.5 h7 M12.5 8 h7 M12.5 23 h7" stroke="%2327231F" stroke-width="1.4"/%3E%3Cpath d="M14.8 8 v15" stroke="%23FF6A5E" stroke-width="1.2"/%3E%3Cpath d="M14.9 28 L16 30.5 L17.1 28z" fill="%2327231F"/%3E%3Cpath d="M12.5 1.5 h7 v21.5 L16 30.5 L12.5 23z" fill="none" stroke="%2327231F" stroke-width="1.4" stroke-linejoin="round"/%3E%3C/g%3E%3C/svg%3E') 4 28, auto;
+  }
+  a, button, [role="button"], label, summary, select {
+    cursor: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"%3E%3Cg transform="rotate(45 16 16)"%3E%3Cpath d="M12.5 1.5 h7 v21.5 L16 30.5 L12.5 23z" fill="none" stroke="%23FFF1D9" stroke-width="3.6" stroke-linejoin="round"/%3E%3Cpath d="M12.5 1.5 h7 v4 h-7z" fill="%23F2A9A0"/%3E%3Cpath d="M12.5 5.5 h7 v2.5 h-7z" fill="%23FFF1D9"/%3E%3Cpath d="M12.5 8 h7 v15 h-7z" fill="%23D94B39"/%3E%3Cpath d="M12.5 23 L16 30.5 L19.5 23z" fill="%23F3E5CC"/%3E%3Cpath d="M12.5 5.5 h7 M12.5 8 h7 M12.5 23 h7" stroke="%2327231F" stroke-width="1.4"/%3E%3Cpath d="M14.8 8 v15" stroke="%23FF6A5E" stroke-width="1.2"/%3E%3Cpath d="M14.9 28 L16 30.5 L17.1 28z" fill="%2327231F"/%3E%3Cpath d="M12.5 1.5 h7 v21.5 L16 30.5 L12.5 23z" fill="none" stroke="%2327231F" stroke-width="1.4" stroke-linejoin="round"/%3E%3C/g%3E%3Cpath d="M6 1.5 C6.5 4.5 7 5 10 5.5 C7 6 6.5 6.5 6 9.5 C5.5 6.5 5 6 2 5.5 C5 5 5.5 4.5 6 1.5Z" fill="%23D94B39" stroke="%23FFF1D9" stroke-width="0.9"/%3E%3C/svg%3E') 4 28, pointer;
+  }
+  input, textarea { cursor: text; }
+}
+
+/* ===== Gentle floating on the first page ===== */
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(var(--bob, -7px)); }
+}
+@keyframes drift {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(2px, -5px) rotate(0.8deg); }
+  66% { transform: translate(-2px, -2px) rotate(-0.6deg); }
+}
+@keyframes sway {
+  0%, 100% { transform: rotate(-4deg); }
+  50% { transform: rotate(5deg); }
+}
+@keyframes twinkle {
+  0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  50% { transform: scale(0.72) rotate(20deg); opacity: 0.6; }
+}
+@keyframes steam {
+  0% { transform: translateY(4px); opacity: 0; }
+  40% { opacity: 0.9; }
+  100% { transform: translateY(-8px); opacity: 0; }
+}
+.float-a { animation: bob 6s ease-in-out infinite; }
+.float-b { animation: bob 7.5s ease-in-out -2s infinite; --bob: -5px; }
+.float-c { animation: drift 9s ease-in-out -1s infinite; }
+.float-d { animation: drift 11s ease-in-out -4s infinite reverse; }
+.sway, .twinkle, .steam, .bloom { transform-box: fill-box; transform-origin: 50% 100%; }
+.sway { animation: sway 5s ease-in-out infinite; }
+.sway-late { animation-delay: -2.5s; }
+.twinkle { transform-origin: 50% 50%; animation: twinkle 3.2s ease-in-out infinite; }
+.twinkle-2 { animation-delay: -1.1s; }
+.twinkle-3 { animation-delay: -2.2s; }
+.steam { animation: steam 3s ease-out infinite; }
+.steam-2 { animation-delay: -1.5s; }
+.bloom { transform-origin: 50% 50%; animation: bob 4.5s ease-in-out infinite; --bob: -4px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .float-a, .float-b, .float-c, .float-d, .float-slow, .sway, .twinkle, .steam, .bloom { animation: none !important; }
+  .steam { opacity: 0.6; }
+}
+
+/* ===== Cursor-reactive parallax (see components/parallax.tsx) ===== */
+.parallax {
+  position: relative;
+  transform: perspective(1400px)
+    rotateX(calc(var(--py, 0) * var(--ptilt, 3deg) * -1))
+    rotateY(calc(var(--px, 0) * var(--ptilt, 3deg)));
+  will-change: transform;
+}
+.parallax:not([data-parallax]) { transform: none; will-change: auto; }
+.depth {
+  translate: calc(var(--px, 0) * var(--d, 10) * 1px) calc(var(--py, 0) * var(--d, 10) * 1px);
+}
+.parallax-light {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  border-radius: 22px;
+  opacity: var(--glow, 0);
+  background: radial-gradient(circle 300px at var(--sx, 50%) var(--sy, 50%), rgb(255 250 235 / 0.28), transparent 70%);
+  mix-blend-mode: soft-light;
+}
+
+/* ===== Notebook cover (first visit per session) ===== */
+.notebook-cover { display: none; }
+.js:not(.cover-seen) .notebook-cover { display: block; cursor: pointer; }
+.cover-leaf {
+  transform-origin: 50% 0;
+  transform-style: preserve-3d;
+  transition: transform 1.1s cubic-bezier(0.55, 0.05, 0.25, 1), opacity 0.35s ease 0.8s;
+}
+.cover-open { transform: rotateX(172deg); opacity: 0; }
+.cover-face, .cover-back { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.cover-back { transform: rotateX(180deg); }
+@keyframes hint { 0%, 100% { opacity: 0.55; translate: -50% 0; } 50% { opacity: 1; translate: -50% -3px; } }
+.cover-hint { animation: hint 1.6s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .js:not(.cover-seen) .notebook-cover { display: none; }
+}
+
+/* ===== Smiley home button ===== */
+.smiley-eye-wink, .smiley-grin, .smiley-blush { opacity: 0; transition: opacity 0.2s ease; }
+.smiley-eye-open, .smiley-smile { transition: opacity 0.2s ease; }
+.smiley-link:hover .smiley-eye-open, .smiley-link:focus-visible .smiley-eye-open,
+.smiley-link:hover .smiley-smile, .smiley-link:focus-visible .smiley-smile { opacity: 0; }
+.smiley-link:hover .smiley-eye-wink, .smiley-link:focus-visible .smiley-eye-wink,
+.smiley-link:hover .smiley-grin, .smiley-link:focus-visible .smiley-grin,
+.smiley-link:hover .smiley-blush, .smiley-link:focus-visible .smiley-blush { opacity: 1; }
+
+/* Phones: keep only compositor-friendly floats; SVG-internal loops repaint every frame. */
+@media (max-width: 767px) {
+  .sway, .twinkle, .bloom, .steam { animation: none !important; }
+  .steam { opacity: 0.6; }
+}
